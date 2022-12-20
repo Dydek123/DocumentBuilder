@@ -1,5 +1,5 @@
-# CV-builder
-The project involves the creation of a CV builder. The user will be able to choose one of several templates and complete the data through a form that will dynamically update the CV view. The data can be saved permanently in the user's profile and then load it into the form in just one click.
+# Document-builder
+The project involves the creation of a document builder. The user will be able to choose one of several templates and complete the data through a form that will dynamically update the document view. The data can be saved permanently in the user's profile and then load it into the form in just one click.
 
 ## Table of contents
 * [Technologies](#technologies)
@@ -14,8 +14,9 @@ The project involves the creation of a CV builder. The user will be able to choo
 * Node.js (Express.js)
 
 ## Setup
-Or run this project on local machine
+Run server
 
 ```
-$ npm run dev
+$ cd Backend
+$ npm start
 ```
