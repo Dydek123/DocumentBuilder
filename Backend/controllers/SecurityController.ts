@@ -3,6 +3,7 @@ import { User } from "../entity/User";
 import registerData from "../interfaces/registerData";
 import authResponse from "../interfaces/authResponse";
 import { UserI } from "../interfaces/userI";
+import loginData from "../interfaces/loginData";
 import signJWT from "../jwt/signJWT";
 
 const bcrypt = require('bcrypt');
@@ -10,6 +11,24 @@ const bcrypt = require('bcrypt');
 export default class SecurityController {
     private passwordMinimalStrength: number = 2.5; // Describe password strength from 0 to 5
     private passwordMinimalLength: number = 6; // Minimal password length
+
+    public validateToken(token):{status:boolean} {
+        return {status:token.exp>Math.floor(new Date().getTime()/1000)};
+    }
+
+    public async login_user(login_data: loginData): Promise<authResponse> {
+        let token: string | undefined;
+        if (!login_data.email || !login_data.password)
+            return this.setErrorResponseForAuth('Enter email and password');
+        const user = await User.findOne({where: {email: login_data.email}});
+        if (!user || await this.checkPassword(login_data.password, user.password)) {
+            return this.setErrorResponseForAuth('User does not exist');
+        }
+        token = await signJWT(user, ((err, token) => {
+            if (err) console.log('Unable to authorize');
+        }))
+        return this.setSuccessResponseForAuth(user, token);
+    }
 
     public async register_user(register_data: registerData): Promise<authResponse> {
         if (!register_data.email || !register_data.password || !register_data.repeatPassword)
@@ -56,5 +75,9 @@ export default class SecurityController {
 
     private passwordIsStrong(password: string): boolean {
         return !(strength(password) < this.passwordMinimalStrength || password.length < this.passwordMinimalLength);
+    }
+
+    private async checkPassword(enteredPassword: string, databasePassword: string): Promise<boolean> {
+        return !await bcrypt.compare(enteredPassword, databasePassword);
     }
 }
