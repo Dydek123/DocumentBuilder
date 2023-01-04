@@ -4,6 +4,7 @@ import registerData from "../interfaces/registerData";
 import authResponse from "../interfaces/authResponse";
 import { UserI } from "../interfaces/userI";
 import loginData from "../interfaces/loginData";
+import responseStatus from "../interfaces/responseStatus";
 import signJWT from "../jwt/signJWT";
 
 const bcrypt = require('bcrypt');
@@ -40,6 +41,22 @@ export default class SecurityController {
         if (!this.passwordIsStrong(register_data.password))
             return this.setErrorResponseForAuth('New password is too weak');
         return await this.createUser(register_data);
+    }
+
+    public async delete_user(email: string): Promise<responseStatus> {
+        const user = await User.findOne({where: {email}});
+        if (!user)
+            return this.setErrorResponse('User does not exist');
+        await User.remove(user);
+        return this.setSuccessResponse();
+    }
+
+    private setErrorResponse(error: string): responseStatus {
+        return {status: 'error', errors: [error]};
+    }
+
+    private setSuccessResponse(): responseStatus {
+        return {status: 'success', errors: []}
     }
 
     private setErrorResponseForAuth(error: string): authResponse {

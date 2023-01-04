@@ -2,6 +2,7 @@ import { Request, Response, Router, NextFunction } from "express";
 import SecurityController from "../controllers/SecurityController";
 import registerData from "../interfaces/registerData";
 import authResponse from "../interfaces/authResponse";
+import responseStatus from "../interfaces/responseStatus";
 import loginData from "../interfaces/loginData";
 import extractJWT from "../jwt/extractJWT";
 
@@ -26,6 +27,12 @@ export class IndexRouter {
         this.router.post('/register', async (req: Request, res: Response): Promise<void> => {
             const body: registerData = req.body;
             const response: authResponse = await this.securityController.register_user(body);
+            res.json(response);
+        });
+
+        this.router.delete('/removeUser', async (req: Request, res: Response): Promise<void> => {
+            const {email} = req.body;
+            const response: responseStatus = await this.securityController.delete_user(email);
             res.json(response);
         });
     }
