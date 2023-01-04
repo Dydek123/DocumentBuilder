@@ -5,6 +5,7 @@ import authResponse from "../interfaces/authResponse";
 import { UserI } from "../interfaces/userI";
 import loginData from "../interfaces/loginData";
 import responseStatus from "../interfaces/responseStatus";
+import updateData from "../interfaces/updateData";
 import signJWT from "../jwt/signJWT";
 
 const bcrypt = require('bcrypt');
@@ -48,6 +49,22 @@ export default class SecurityController {
         if (!user)
             return this.setErrorResponse('User does not exist');
         await User.remove(user);
+        return this.setSuccessResponse();
+    }
+
+    public async updatePassword(updateData: updateData): Promise<responseStatus> {
+        if (!updateData.email || !updateData.password || !updateData.oldPassword)
+            return this.setErrorResponse('Enter email and new password');
+        if (!this.passwordIsStrong(updateData.password))
+            return this.setErrorResponse('New password is too weak');
+
+        const user = await User.findOne({where: {email: updateData.email}});
+        if (!user)
+            return this.setErrorResponse('User does not exist');
+        if (user.password !== updateData.oldPassword)
+            return this.setErrorResponse('Old password is not correct');
+        user.password = updateData.password;
+        await User.save(user);
         return this.setSuccessResponse();
     }
 

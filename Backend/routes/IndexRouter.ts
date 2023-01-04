@@ -4,6 +4,7 @@ import registerData from "../interfaces/registerData";
 import authResponse from "../interfaces/authResponse";
 import responseStatus from "../interfaces/responseStatus";
 import loginData from "../interfaces/loginData";
+import updateData from "../interfaces/updateData";
 import extractJWT from "../jwt/extractJWT";
 
 export class IndexRouter {
@@ -33,6 +34,12 @@ export class IndexRouter {
         this.router.delete('/removeUser', async (req: Request, res: Response): Promise<void> => {
             const {email} = req.body;
             const response: responseStatus = await this.securityController.delete_user(email);
+            res.json(response);
+        });
+
+        this.router.put('/updatePassword', async (req: Request, res: Response): Promise<void> => {
+            const body: updateData = req.body;
+            const response: responseStatus = await this.securityController.updatePassword(body);
             res.json(response);
         });
     }
